@@ -2,7 +2,6 @@ import rclpy
 from rclpy.node import Node
 import geometry_msgs.msg
 
-
 class TwistPublisher(Node):
 
     def __init__(self):
@@ -30,9 +29,6 @@ def main(args=None):
 
     rclpy.spin(twist_publisher)
 
-    # Destroy the node explicitly
-    # (optional - otherwise it will be done automatically
-    # when the garbage collector destroys the node object)
     twist_publisher.destroy_node()
     rclpy.shutdown()
 
