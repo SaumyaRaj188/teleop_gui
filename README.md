@@ -26,10 +26,10 @@ Git clone inside src folder of the workspace
     
 2. Install the required packages.
     ```
-    pip install -r requirements.txt
+    pip install -r src/teleop_gui/requirements.txt
     ```
     
 3. Run the main.py file.
     ```
-    python teleop_gui/main.py
+    python3 src/teleop_gui/gui/main.py
     ```
