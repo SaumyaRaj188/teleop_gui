@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 import geometry_msgs.msg
+from .gui.joystick import QJoystick
 
 class TwistPublisher(Node):
 
