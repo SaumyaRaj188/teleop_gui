@@ -1,9 +1,21 @@
-# teleop_gui (Only given Linear velocity for now)
-install dependensies - rosdep install -i --from-paths src --rosdistro foxy -y
+Git clone inside src folder of the workspace
+
+# To run twist message publisher
+1. Install dependensies
+    ```
+    rosdep install -i --from-paths src --rosdistro foxy -y
+    ```
   
-build in src folder of workspace using - colcon build --symlink-install
+2. Build and source using
+    ```
+    colcon build --symlink-install
+    source install/setup.bash
+    ```
   
-run using - ros2 run teleop_gui teleop
+3. run using
+    ```
+    ros2 run teleop_gui teleop
+    ```
 
 # To run PyQt5 controller gui:
 1. Create a virtual environment and activate it. [Optional]
@@ -11,10 +23,12 @@ run using - ros2 run teleop_gui teleop
     python -m venv .venv
     .venv\Scripts\Activate.ps1
     ```
+    
 2. Install the required packages.
     ```
     pip install -r requirements.txt
     ```
+    
 3. Run the main.py file.
     ```
     python teleop_gui/main.py
