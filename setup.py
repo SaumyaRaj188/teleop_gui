@@ -1,12 +1,11 @@
 from setuptools import setup
 
 package_name = 'teleop_gui'
-submodule = 'teleop_gui/gui'
 
 setup(
     name=package_name,
     version='0.0.0',
-    packages=[package_name, submodule],
+    packages=[package_name],
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
@@ -21,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points= {
         'console_scripts': [
-            'teleop = teleop_gui.teleop_pub:main',
+            'teleop = teleop_gui.main:main',
         ],
     },
 )
