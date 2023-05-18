@@ -19,17 +19,31 @@ Git clone inside src folder of the workspace
 
 # To run PyQt5 controller gui:
 1. Create a virtual environment and activate it. [Optional]
-    ```
-    python -m venv .venv
-    .venv\Scripts\Activate.ps1
-    ```
+    - Create a virtual environment
+        ```
+        pip install virtualenv
+        virtualenv .venv
+        ```
+    - Source the environment (Windows) or
+        ```
+        .venv\Scripts\Activate.ps1
+        ```
+    - Source the environment (Linux)
+        ```
+        source .venv\bin\activate
+        ```
     
 2. Install the required packages.
     ```
-    pip install -r src/teleop_gui/requirements.txt
+    pip install -r requirements.txt
     ```
     
-3. Run the main.py file.
+3. Run the application.
     ```
-    python3 src/teleop_gui/gui/main.py
+    python3 teleop_gui/main.py
+    ```
+
+4. Run the test_listener.py file. [Optional]
+    ```
+    python3 teleop_gui/test_listener.py
     ```
