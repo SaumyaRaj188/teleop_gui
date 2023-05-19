@@ -7,22 +7,42 @@ from roslibpy import Ros
 from publisher import TwistPublisher
 
 class MainWindow(QMainWindow):
+    JOYSTICK_SPEED = 3
+    UPDATE_DT = 16
+    PUBLISH_DT = 500
+    DEFAULT_TOPIC = "/cmd_vel"
+    HELP_TEXT = '\n'.join([
+        "Use the angle joystick to steer the bot, and",
+        "the speed joystick to drive forward and back.",
+        "Press the middle mouse button or the shift key",
+        "to lock either joystick at a value."
+    ])
+
     def __init__(self):
         super().__init__()
         
+        self.inputHandler = QInputHandler()
+
         self.ros = Ros(host='localhost', port=9090)
         self.ros.run()
-
+        
         self.publisherNode = None
+        self.createNode(MainWindow.DEFAULT_TOPIC)
 
-        self.setWindowTitle("QTTest")
+        self.setWindowTitle("AresBot Controller")
         self.setGeometry(0, 0, 600, 360)
-        self.centerWindow()
-
+        MainWindow.centerWindow(self)
+        
         self.createWidgets()
         self.arrangeWidgets()
-        self.setupUpdateLoop()
-        self.setupPublisher()
+
+        self.updateTimer = QTimer()
+        self.updateTimer.timeout.connect(self.onUpdate)
+        self.updateTimer.start(MainWindow.UPDATE_DT)
+
+        self.publishTimer = QTimer()
+        self.publishTimer.timeout.connect(self.onPublish)
+        self.publishTimer.start(MainWindow.PUBLISH_DT)
 
     def createWidgets(self):
         smallFont = self.font() ; smallFont.setPointSize(16)
@@ -42,14 +62,14 @@ class MainWindow(QMainWindow):
         self.angleLbl.setFont(regularFont)
         self.angleLbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
-        self.angleJS = QJoystick(QJoystickAxes.Horizontal | QJoystickAxes.Vertical)
+        self.angleJS = QJoystick(QJoystickAxes.UpperHalf, self.inputHandler)
         self.angleJS.setKeys(Qt.Key.Key_W, Qt.Key.Key_S, Qt.Key.Key_A, Qt.Key.Key_D)
         
         self.speedLbl = QLabel("Speed")
         self.speedLbl.setFont(regularFont)
         self.speedLbl.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
-        self.speedJS = QJoystick(QJoystickAxes.Horizontal)
+        self.speedJS = QJoystick(QJoystickAxes.Vertical, self.inputHandler)
         self.speedJS.setKeys(Qt.Key.Key_Up, Qt.Key.Key_Down, None, None)
 
         self.thirdRow = QHBoxLayout()
@@ -59,10 +79,20 @@ class MainWindow(QMainWindow):
         self.topicLbl.setFont(smallFont)
         
         self.topicEdit = QLineEdit()
-        self.topicEdit.setText("/cmd_vel")
+        self.topicEdit.setText(MainWindow.DEFAULT_TOPIC)
         self.topicEdit.setPlaceholderText("/topic_name")
         self.topicEdit.setFont(smallFont)
-        self.topicEdit.returnPressed.connect(self.createNode)
+        self.topicEdit.returnPressed.connect(lambda: self.createNode(self.topicEdit.text()))
+
+        self.helpPopup = QLabel(MainWindow.HELP_TEXT)
+        self.helpPopup.setWindowTitle("Help")
+        self.helpPopup.setGeometry(QRect(0, 0, 400, 200))
+        self.helpPopup.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        MainWindow.centerWindow(self.helpPopup)
+
+        self.helpButton = QPushButton()
+        self.helpButton.setText('?')
+        self.helpButton.pressed.connect(self.helpPopup.show)
 
     def arrangeWidgets(self):
         root = QWidget()
@@ -86,36 +116,23 @@ class MainWindow(QMainWindow):
         self.thirdRow.addWidget(self.topicLbl)
         self.thirdRow.addSpacing(20)
         self.thirdRow.addWidget(self.topicEdit)
+        self.thirdRow.addSpacing(40)
+        self.thirdRow.addWidget(self.helpButton)
         self.thirdRow.addStretch()
         self.grid.addLayout(self.thirdRow, 6, 0, 1, 2)
 
-    def setupUpdateLoop(self):
-        self.inputHandler = QInputHandler()
-        self.updateTimer = QTimer()
-        self.updateTimer.timeout.connect(self.onUpdate)
-        self.updateTimer.start(16)
-
-    def setupPublisher(self):
-        self.createNode()
-        self.publishTimer = QTimer()
-        self.publishTimer.timeout.connect(self.onPublish)
-        self.publishTimer.start(500)
-
-    def createNode(self):
+    def createNode(self, topic_name):
         if self.publisherNode:
             self.publisherNode.destroy()
-        self.publisherNode = TwistPublisher(self.ros, self.topicEdit.text())
+        self.publisherNode = TwistPublisher(self.ros, topic_name)
 
     def onPublish(self):
         if self.publisherNode:
             self.publisherNode.publish(angle=self.angleJS.value, speed=self.speedJS.value)
 
     def onUpdate(self):
-        SPEED = 3
-        DT = 0.016
-        
-        self.speedJS.update(self.inputHandler, SPEED, DT)
-        self.angleJS.update(self.inputHandler, SPEED, DT)
+        self.speedJS.update(MainWindow.JOYSTICK_SPEED, MainWindow.UPDATE_DT / 1000)
+        self.angleJS.update(MainWindow.JOYSTICK_SPEED, MainWindow.UPDATE_DT / 1000)
 
     def closeEvent(self, a0: QCloseEvent):
         self.updateTimer.stop()
@@ -133,10 +150,11 @@ class MainWindow(QMainWindow):
             self.inputHandler.keyReleased(ev.key())
         return super().keyPressEvent(ev)
 
-    def centerWindow(self):
-        rect = self.frameGeometry()
+    @staticmethod
+    def centerWindow(window):
+        rect = window.frameGeometry()
         center = QDesktopWidget().availableGeometry().center()
         rect.moveCenter(center)
-        self.move(rect.topLeft())
+        window.move(rect.topLeft())
 
     

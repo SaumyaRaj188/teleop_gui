@@ -1,20 +1,25 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from enum import Flag
+from enum import Enum
 
-class QJoystickAxes(Flag):
-    Horizontal = (1 << 0)
-    Vertical = (1 << 1)
+class QJoystickAxes(Enum):
+    Horizontal = 1
+    Vertical = 2
+    Complete = 3
+    UpperHalf = 4
+    LowerHalf = 5
 
 class QJoystick(QWidget):
-    def __init__(self, axes):
+    def __init__(self, axes, inputHandler):
         super().__init__()
 
         self.axes = axes
+        self.inputHandler = inputHandler
         self.setKeys(None, None, None, None)
         
         self.__stickPos = None
+        self.__sticky = False
         self.__hasMouse = False
         self.__innerToOuterRatio = 0.4
 
@@ -67,19 +72,33 @@ class QJoystick(QWidget):
         vec -= center
         
         if self.axes == QJoystickAxes.Horizontal:
-            x = center.x()
-            y = clamp(vec.y(), -outerDia / 2, outerDia / 2) + center.y()
-            return QVector2D(x, y)
-        
-        elif self.axes == QJoystickAxes.Vertical:
             x = clamp(vec.x(), -outerDia / 2, outerDia / 2) + center.x()
             y = center.y()
             return QVector2D(x, y)
         
-        elif self.axes == (QJoystickAxes.Horizontal | QJoystickAxes.Vertical):
+        elif self.axes == QJoystickAxes.Vertical:
+            x = center.x()
+            y = clamp(vec.y(), -outerDia / 2, outerDia / 2) + center.y()
+            return QVector2D(x, y)
+        
+        elif self.axes == QJoystickAxes.Complete:
             mag = vec.length()
             vec = (vec / mag) * min(mag, outerDia / 2) if mag != 0 else vec
             vec += center
+            return vec
+        
+        elif self.axes == QJoystickAxes.UpperHalf:
+            mag = vec.length()
+            vec = (vec / mag) * min(mag, outerDia / 2) if mag != 0 else vec
+            vec += center
+            vec.setY(min(vec.y(), center.y()))
+            return vec
+        
+        elif self.axes == QJoystickAxes.LowerHalf:
+            mag = vec.length()
+            vec = (vec / mag) * min(mag, outerDia / 2) if mag != 0 else vec
+            vec += center
+            vec.setY(max(vec.y(), center.y()))
             return vec
 
     def mousePressEvent(self, ev: QMouseEvent):
@@ -97,30 +116,29 @@ class QJoystick(QWidget):
 
     def mouseReleaseEvent(self, ev: QMouseEvent):
         self.__hasMouse = False
-        if not ev.button() == Qt.MouseButton.RightButton:
-            self.__stickPos = self.getDrawingCenter()
+        self.__sticky = (ev.button() == Qt.MouseButton.MiddleButton) or (self.inputHandler[Qt.Key.Key_Shift])
         self.repaint()
         return super().mousePressEvent(ev)
 
-    def update(self, inputHandler, speed, dt):
+    def update(self, speed, dt):
         controlled = self.__hasMouse
 
         if not self.__hasMouse:
-            if self.up_key and inputHandler[self.up_key]:
+            if self.up_key and self.inputHandler[self.up_key]:
                 self.value += QVector2D(0, speed * dt)
                 controlled = True
-            elif self.down_key and inputHandler[self.down_key]:
+            elif self.down_key and self.inputHandler[self.down_key]:
                 self.value -= QVector2D(0, speed * dt)
                 controlled = True
 
-            if self.left_key and inputHandler[self.left_key]:
+            if self.left_key and self.inputHandler[self.left_key]:
                 self.value -= QVector2D(speed * dt, 0)
                 controlled = True
-            elif self.right_key and inputHandler[self.right_key]:
+            elif self.right_key and self.inputHandler[self.right_key]:
                 self.value += QVector2D(speed * dt, 0)
                 controlled = True
         
-        if not controlled:
+        if not (controlled or self.__sticky):
             self.value *= 0.9
 
     def resizeEvent(self, a0: QResizeEvent):
