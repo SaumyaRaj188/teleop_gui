@@ -4,7 +4,7 @@
   <name>teleop_gui</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
-  <maintainer email="saumyaraj188@gmail.com">steins</maintainer>
+  <maintainer email="TODO">ARES</maintainer>
   <license>TODO: License declaration</license>
 
   <exec_depend>rosbridge_server</exec_depend>

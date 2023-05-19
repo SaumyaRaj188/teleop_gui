@@ -16,8 +16,8 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='steins',
-    maintainer_email='saumyaraj188@gmail.com',
+    maintainer='ARES',
+    maintainer_email='TODO',
     description='TODO: Package description',
     license='TODO: License declaration',
     entry_points= {
