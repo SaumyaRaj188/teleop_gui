@@ -1,6 +1,6 @@
 Git clone inside src folder of the workspace
 
-# To run twist message publisher
+# To run build the pakage
 1. Install dependensies
     ```
     rosdep install -i --from-paths src --rosdistro foxy -y
@@ -10,11 +10,6 @@ Git clone inside src folder of the workspace
     ```
     colcon build --symlink-install
     source install/setup.bash
-    ```
-  
-3. run using
-    ```
-    ros2 run teleop_gui teleop
     ```
 
 # To run PyQt5 controller gui:
@@ -40,10 +35,19 @@ Git clone inside src folder of the workspace
     
 3. Run the application.
     ```
-    python3 teleop_gui/main.py
+    ros2 launch teleop_gui controller.launch.py
     ```
 
-4. Run the test_listener.py file. [Optional]
+   Run with the test_listener.py file. [Optional]
     ```
-    python3 teleop_gui/test_listener.py
+    ros2 launch teleop_gui controller.launch.py test:=True
     ```
+   
+#Controls:
+```
+        W                   ↑
+    S       D               ↓
+     (Angle)             (Speed)
+
+     To hold mouse press : Shift Key
+```
