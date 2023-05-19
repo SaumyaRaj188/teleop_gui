@@ -1,4 +1,5 @@
 from roslibpy import Topic, Message
+from math import pi, atan2
 
 class TwistPublisher:
     def __init__(self, ros, topic_name):
@@ -6,17 +7,22 @@ class TwistPublisher:
         self.topic = Topic(ros=ros, name=topic_name, message_type='geometry_msgs/Twist')
 
     def publish(self, angle, speed):
-        from random import random
+        if angle.lengthSquared() < 0.01:
+            rot = 0
+        else:
+            angle = angle.normalized()
+            rot = atan2(angle.y(), angle.x()) - pi/2
+
         twist = {
             'linear': {
-                'x': random(),
-                'y': random(),
-                'z': random()
+                'x': speed.y(),
+                'y': 0,
+                'z': 0,
             },
             'angular': {
-                'x': random(),
-                'y': random(),
-                'z': random()
+                'x': 0,
+                'y': 0,
+                'z': rot
             },
         }
         self.topic.publish(Message(twist))

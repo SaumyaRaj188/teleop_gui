@@ -1,6 +1,6 @@
 import roslibpy
 
-if __name__ == '__main__':
+def main():
     client = roslibpy.Ros(host='localhost', port=9090)
     client.run()
 
@@ -12,3 +12,6 @@ if __name__ == '__main__':
             pass
     except KeyboardInterrupt:
         client.terminate()
+
+if __name__ == '__main__':
+    main()

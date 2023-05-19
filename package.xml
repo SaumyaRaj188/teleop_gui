@@ -7,7 +7,7 @@
   <maintainer email="saumyaraj188@gmail.com">steins</maintainer>
   <license>TODO: License declaration</license>
 
-  <exec_depend>rclpy</exec_depend>
+  <exec_depend>rosbridge_server</exec_depend>
   <exec_depend>geometry_msgs</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
