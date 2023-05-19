@@ -1,10 +1,10 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-from inputs import QInputHandler
-from joystick import QJoystick, QJoystickAxes
+from .inputs import QInputHandler
+from .joystick import QJoystick, QJoystickAxes
 from roslibpy import Ros
-from publisher import TwistPublisher
+from .publisher import TwistPublisher
 
 class MainWindow(QMainWindow):
     JOYSTICK_SPEED = 3
