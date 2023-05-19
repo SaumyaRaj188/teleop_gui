@@ -17,7 +17,7 @@ setup(
     install_requires=['setuptools'],
     zip_safe=True,
     maintainer='ARES',
-    maintainer_email='TODO',
+    maintainer_email='myemail@gmail.com',
     description='TODO: Package description',
     license='TODO: License declaration',
     entry_points= {
