@@ -1,6 +1,6 @@
 Git clone inside src folder of the workspace
 
-# To run build the pakage
+# To build the pakage
 1. Install dependensies
     ```
     rosdep install -i --from-paths src --rosdistro foxy -y
